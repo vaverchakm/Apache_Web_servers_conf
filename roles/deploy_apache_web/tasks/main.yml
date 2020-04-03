@@ -1,0 +1,26 @@
+---
+# tasks file for deploy_apache_web
+
+
+  - name: Check and print LINUX Version
+    debug: var=ansible_os_family
+    
+  - name: Check version of distro
+    debug: var=ansible_distribution_version
+
+  - name: Install Apache Web Server
+    yum: name=httpd state=latest
+
+  - name: Generate INDEX>HTML file
+    template: src=index.j2 dest={{ destin_folder }}/index.html mode=0555
+    notify: Restart Apache
+
+  - name: Copy MyHomePage File to Web Server
+    copy: src={{ item }} dest={{ destin_folder }} mode=0555
+    loop:
+      - "image1.jpg"
+      - "image2.jpg"
+    notify: Restart Apache
+
+  - name: Start WeServer and make it enable on boot
+    service: name=httpd state=started enabled=yes
